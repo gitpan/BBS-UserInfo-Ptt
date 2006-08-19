@@ -12,11 +12,11 @@ BBS::UserInfo::Ptt - Get user information of PTT-style BBS
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -24,9 +24,11 @@ our $VERSION = '0.03';
 
     # create object
     my $bot = BBS::UserInfo::Ptt->new(
+	    'debug' => 1,
 	    'port' => 23,
 	    'server' => 'ptt.cc',
-	    'telnet' => '/usr/bin/telnet'
+	    'telnet' => '/usr/bin/telnet',
+	    'timeout' => 10
 	    );
 
     # connect to the server
@@ -34,7 +36,7 @@ our $VERSION = '0.03';
 
     my $userdata = $bot->query('username');
 
-    # available: nickname, logintimes, posttimes, lastlogintime, lastloginip
+    # print some data
     print($userdata->{'logintimes'});
 
 =head1 FUNCTIONS
@@ -47,6 +49,8 @@ can define:
     server => 'ptt.cc'	# Necessary, server name
     port => 23		# Optional, server port
     telnet => 'telnet'	# Optional, telnet program
+    timeout => 10	# Optional, Expect timeout
+    debug => 1		# Optional, print debug information
 
 =cut
 
@@ -54,6 +58,7 @@ sub new {
     my ($class, %params) = @_;
 
     my %self = (
+	'debug' => 0,
 	'password' => '',	# incomplete function
 	'port' => 23,
 	'server' => undef,
@@ -91,8 +96,10 @@ sub _login {
     my $self = shift();
 
     my $bot = $self->{'expect'};
+    my $debug = $self->{'debug'};
 
-    $bot->expect($self->{'timeout'}, '½Ð¿é¤J¥N¸¹');
+    print("Waiting for login\n") if ($debug);
+    $bot->expect($self->{'timeout'}, '-re', '½Ð¿é¤J¥N¸¹');
     $bot->send($self->{'username'}, "\r\n[D[D");
 }
 
@@ -120,24 +127,37 @@ sub query {
     my ($self, $user) = @_;
 
     my $bot = $self->{'expect'};
+    my $debug = $self->{'debug'};
     my $timeout = $self->{'timeout'};
+
     $bot->send("[D[Dt\r\nq\r\n", $user, "\r\n");
 
     my %h;
-    $bot->expect($timeout, /¡m¢×¢Ò¼ÊºÙ¡n\w+\(.+\)\s+¡m\s/);
-    $h{'nickname'} = $bot->match();
 
-    $bot->expect($timeout, /¡m¤W¯¸¦¸¼Æ¡n(\d+)¦¸/);
-    $h{'logintimes'} = $bot->match();
+    print("Waiting for nickname\n") if ($debug);
+    $bot->expect($timeout, '-re', '¡m¢×¢Ò¼ÊºÙ¡n\S+\((.*)\)\s*¡m');
+    $h{'nickname'} = ($bot->matchlist)[0];
+    printf("nickname = %s\n", $h{'nickname'}) if ($debug);
 
-    $bot->expect($timeout, /¡m¤å³¹½g¼Æ¡n(\d+)½g/);
-    $h{'posttimes'} = $bot->match();
+    print("Waiting for logintimes\n") if ($debug);
+    $bot->expect($timeout, '-re', '¡m¤W¯¸¦¸¼Æ¡n(\d+)¦¸');
+    $h{'logintimes'} = ($bot->matchlist)[0];
+    printf("logintimes = %s\n", $h{'logintimes'}) if ($debug);
 
-    $bot->expect($timeout, /¡m¤W¦¸¤W¯¸¡n(\w+\s\w+\s\w+)\s/);
-    $h{'lastlogintime'} = $bot->match();
+    print("Waiting for posttimes\n") if ($debug);
+    $bot->expect($timeout, '-re', '¡m¤å³¹½g¼Æ¡n(\d+)½g');
+    $h{'posttimes'} = ($bot->matchlist)[0];
+    printf("posttimes = %s\n", $h{'posttimes'}) if ($debug);
 
-    $bot->expect($timeout, /¡m¤W¦¸¬G¶m¡n(\w+)/);
-    $h{'lastloginip'} = $bot->match();
+    print("Waiting for lastelogintime\n") if ($debug);
+    $bot->expect($timeout, '-re', '¡m¤W¦¸¤W¯¸¡n(\S+\s\S+\s\S+)\s');
+    $h{'lastlogintime'} = ($bot->matchlist)[0];
+    printf("lastlogintime = %s\n", $h{'lastlogintime'}) if ($debug);
+
+    print("Waiting for lasteloginip\n") if ($debug);
+    $bot->expect($timeout, '-re', '¡m¤W¦¸¬G¶m¡n(\S+)');
+    $h{'lastloginip'} = ($bot->matchlist)[0];
+    printf("lastloginip = %s\n", $h{'lastloginip'}) if ($debug);
 
     return \%h;
 }

@@ -9,6 +9,7 @@ WriteMakefile(
     ABSTRACT_FROM       => 'Ptt.pm',
     PL_FILES            => {},
     PREREQ_PM => {
+	'Carp' => 0,
 	'Expect' => 0,
         'Test::More' => 0,
     },
