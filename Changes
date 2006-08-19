@@ -1,8 +1,12 @@
 Revision history for BBS-UserInfo-Ptt
 
+0.03	2006-08-20
+	- Turn off Expect output.
+	- Not use quotemeta to hostname.
+
 0.02	2006-08-20
-	Bug fix about initial problem.
+	- Bug fix about initial problem.
 
 0.01    2006-08-19
-        First version.
+        - First version.
 

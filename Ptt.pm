@@ -16,7 +16,7 @@ Version 0.02
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
@@ -78,15 +78,16 @@ Connect to the BBS server.
 sub connect {
     my $self = shift();
 
-    $self->{'expect'} = Expect->spawn($self->{'telnet'},
-	    quotemeta($self->{'server'}), $self->{'port'});
+    $self->{'expect'} = Expect->spawn($self->{'telnet'}, $self->{'server'},
+	$self->{'port'});
+    $self->{'expect'}->log_stdout(0);
 
-    $self->login($self);
+    $self->_login($self);
 
     return $self->{'expect'};
 }
 
-sub login {
+sub _login {
     my $self = shift();
 
     my $bot = $self->{'expect'};
