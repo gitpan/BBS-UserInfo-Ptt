@@ -5,12 +5,12 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME                => 'BBS::UserInfo::Ptt',
     AUTHOR              => 'Gea-Suan Lin <gslin@gslin.org>',
-    VERSION_FROM        => 'lib/BBS/UserInfo/Ptt.pm',
-    ABSTRACT_FROM       => 'lib/BBS/UserInfo/Ptt.pm',
+    VERSION_FROM        => 'Ptt.pm',
+    ABSTRACT_FROM       => 'Ptt.pm',
     PL_FILES            => {},
     PREREQ_PM => {
-        'Test::More' => 0,
 	'Expect' => 0,
+        'Test::More' => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'BBS-UserInfo-Ptt-*' },

@@ -3,6 +3,7 @@ package BBS::UserInfo::Ptt;
 use warnings;
 use strict;
 
+use Carp;
 use Expect;
 
 =head1 NAME
@@ -11,11 +12,11 @@ BBS::UserInfo::Ptt - Get user information of PTT-style BBS
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -50,23 +51,22 @@ can define:
 =cut
 
 sub new {
-    my $self = shift();
+    my ($class, %params) = @_;
 
-    my %this = {
+    my %self = (
 	'password' => '',	# incomplete function
 	'port' => 23,
 	'server' => undef,
 	'telnet' => 'telnet',
 	'timeout' => 10,
 	'username' => 'guest'	# incomplete function
-    };
+    );
 
-    my %params = @_;
     while (my ($k, $v) = each(%params)) {
-	$this{$k} = $v if (exists $this{$k});
+	$self{$k} = $v if (exists $self{$k});
     }
 
-    return bless($self, \%this);
+    return bless(\%self, $class);
 }
 
 =head2 connect()
@@ -76,23 +76,23 @@ Connect to the BBS server.
 =cut
 
 sub connect {
-    my ($self, $this) = @_;
+    my $self = shift();
 
-    $this->{'expect'} = Expect->spawn($this->{'telnet'},
-	    quotemeta($this->{'server'}), $this->{'port'});
+    $self->{'expect'} = Expect->spawn($self->{'telnet'},
+	    quotemeta($self->{'server'}), $self->{'port'});
 
-    $self->login($self, $this);
+    $self->login($self);
 
-    return $this->{'expect'};
+    return $self->{'expect'};
 }
 
 sub login {
-    my ($self, $this) = @_;
+    my $self = shift();
 
-    my $bot = $this->{'expect'};
+    my $bot = $self->{'expect'};
 
-    $bot->expect($this->{'timeout'}, '½Ğ¿é¤J¥N¸¹');
-    $bot->send($this->{'username'}, "\r\n[D[D");
+    $bot->expect($self->{'timeout'}, '½Ğ¿é¤J¥N¸¹');
+    $bot->send($self->{'username'}, "\r\n[D[D");
 }
 
 =head2 query()
@@ -116,10 +116,10 @@ Query user information and return a hash reference with:
 =cut
 
 sub query {
-    my ($self, $this, $user) = @_;
+    my ($self, $user) = @_;
 
-    my $bot = $this->{'expect'};
-    my $timeout = $this->{'timeout'};
+    my $bot = $self->{'expect'};
+    my $timeout = $self->{'timeout'};
     $bot->send("[D[Dt\r\nq\r\n", $user, "\r\n");
 
     my %h;

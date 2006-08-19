@@ -1,8 +1,8 @@
 # http://module-build.sourceforge.net/META-spec.html
 #XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
 name:         BBS-UserInfo-Ptt
-version:      0.01
-version_from: lib/BBS/UserInfo/Ptt.pm
+version:      0.02
+version_from: Ptt.pm
 installdirs:  site
 requires:
     Expect:                        0
