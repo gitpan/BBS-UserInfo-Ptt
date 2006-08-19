@@ -10,13 +10,9 @@ use Expect;
 
 BBS::UserInfo::Ptt - Get user information of PTT-style BBS
 
-=head1 VERSION
-
-Version 0.05
-
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 SYNOPSIS
 
@@ -87,7 +83,7 @@ sub connect {
 	$self->{'port'});
     $self->{'expect'}->log_stdout(0);
 
-    return undef unless defined($self->_login($self);
+    return undef unless (defined($self->_login($self)));
 
     return $self->{'expect'};
 }
@@ -141,31 +137,31 @@ sub query {
     $bot->expect($timeout, '-re', '《ＩＤ暱稱》\S+\((.*)\)\s*《');
     $h{'nickname'} = ($bot->matchlist)[0];
     printf("nickname = %s\n", $h{'nickname'}) if ($debug);
-    return undef if ($bot->erorr());
+    return undef if ($bot->error());
 
     print("Waiting for logintimes\n") if ($debug);
     $bot->expect($timeout, '-re', '《上站次數》(\d+)次');
     $h{'logintimes'} = ($bot->matchlist)[0];
     printf("logintimes = %s\n", $h{'logintimes'}) if ($debug);
-    return undef if ($bot->erorr());
+    return undef if ($bot->error());
 
     print("Waiting for posttimes\n") if ($debug);
     $bot->expect($timeout, '-re', '《文章篇數》(\d+)篇');
     $h{'posttimes'} = ($bot->matchlist)[0];
     printf("posttimes = %s\n", $h{'posttimes'}) if ($debug);
-    return undef if ($bot->erorr());
+    return undef if ($bot->error());
 
     print("Waiting for lastelogintime\n") if ($debug);
     $bot->expect($timeout, '-re', '《上次上站》(\S+\s\S+\s\S+)\s');
     $h{'lastlogintime'} = ($bot->matchlist)[0];
     printf("lastlogintime = %s\n", $h{'lastlogintime'}) if ($debug);
-    return undef if ($bot->erorr());
+    return undef if ($bot->error());
 
     print("Waiting for lasteloginip\n") if ($debug);
     $bot->expect($timeout, '-re', '《上次故鄉》(\S+)');
     $h{'lastloginip'} = ($bot->matchlist)[0];
     printf("lastloginip = %s\n", $h{'lastloginip'}) if ($debug);
-    return undef if ($bot->erorr());
+    return undef if ($bot->error());
 
     return \%h;
 }
