@@ -1,5 +1,8 @@
 Revision history for BBS-UserInfo-Ptt
 
+0.05	2006-08-20
+	- If timeout, then return undef.
+
 0.04	2006-08-20
 	- Use '-re'.
 	- Introduce timeout & debug.

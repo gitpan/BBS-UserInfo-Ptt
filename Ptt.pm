@@ -12,11 +12,11 @@ BBS::UserInfo::Ptt - Get user information of PTT-style BBS
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
@@ -87,7 +87,7 @@ sub connect {
 	$self->{'port'});
     $self->{'expect'}->log_stdout(0);
 
-    $self->_login($self);
+    return undef unless defined($self->_login($self);
 
     return $self->{'expect'};
 }
@@ -100,7 +100,10 @@ sub _login {
 
     print("Waiting for login\n") if ($debug);
     $bot->expect($self->{'timeout'}, '-re', '½Ğ¿é¤J¥N¸¹');
+    return undef if ($bot->error());
+
     $bot->send($self->{'username'}, "\r\n[D[D");
+    return 1;
 }
 
 =head2 query()
@@ -138,26 +141,31 @@ sub query {
     $bot->expect($timeout, '-re', '¡m¢×¢Ò¼ÊºÙ¡n\S+\((.*)\)\s*¡m');
     $h{'nickname'} = ($bot->matchlist)[0];
     printf("nickname = %s\n", $h{'nickname'}) if ($debug);
+    return undef if ($bot->erorr());
 
     print("Waiting for logintimes\n") if ($debug);
     $bot->expect($timeout, '-re', '¡m¤W¯¸¦¸¼Æ¡n(\d+)¦¸');
     $h{'logintimes'} = ($bot->matchlist)[0];
     printf("logintimes = %s\n", $h{'logintimes'}) if ($debug);
+    return undef if ($bot->erorr());
 
     print("Waiting for posttimes\n") if ($debug);
     $bot->expect($timeout, '-re', '¡m¤å³¹½g¼Æ¡n(\d+)½g');
     $h{'posttimes'} = ($bot->matchlist)[0];
     printf("posttimes = %s\n", $h{'posttimes'}) if ($debug);
+    return undef if ($bot->erorr());
 
     print("Waiting for lastelogintime\n") if ($debug);
     $bot->expect($timeout, '-re', '¡m¤W¦¸¤W¯¸¡n(\S+\s\S+\s\S+)\s');
     $h{'lastlogintime'} = ($bot->matchlist)[0];
     printf("lastlogintime = %s\n", $h{'lastlogintime'}) if ($debug);
+    return undef if ($bot->erorr());
 
     print("Waiting for lasteloginip\n") if ($debug);
     $bot->expect($timeout, '-re', '¡m¤W¦¸¬G¶m¡n(\S+)');
     $h{'lastloginip'} = ($bot->matchlist)[0];
     printf("lastloginip = %s\n", $h{'lastloginip'}) if ($debug);
+    return undef if ($bot->erorr());
 
     return \%h;
 }
